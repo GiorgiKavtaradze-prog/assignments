@@ -1,0 +1,36 @@
+# Build results
+bin/
+obj/
+*.exe
+*.dll
+*.pdb
+*.app
+*.msi
+*.publish/
+
+# Visual Studio
+.vs/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# NuGet
+packages/
+*.nuget.props
+*.nuget.targets
+packages.config
+
+# .NET
+*.log
+*.vspscc
+*.vssscc
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Rider
+.idea/
+*.DotSettings.user
