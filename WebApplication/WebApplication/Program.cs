@@ -10,18 +10,11 @@ using WebApplication.Validators;
 
 var builder = Microsoft.AspNetCore.Builder.WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddScoped<IPersonService, PersonService>();
-
-// Add AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));
-
-// Add Controllers with versioning
 builder.Services.AddControllers();
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<PersonCreateDtoValidator>();
-
-// Add API Versioning
 builder.Services.AddApiVersioning(options =>
 {
     options.DefaultApiVersion = new ApiVersion(1, 0);
@@ -33,14 +26,8 @@ builder.Services.AddApiVersioning(options =>
         new HeaderApiVersionReader("X-API-Version")
     );
 });
-
-// Add Response Caching
 builder.Services.AddResponseCaching();
-
-// Add Health Checks
 builder.Services.AddHealthChecks();
-
-// Add CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -50,8 +37,6 @@ builder.Services.AddCors(options =>
               .AllowAnyHeader();
     });
 });
-
-// Add Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -65,12 +50,9 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-// Enable Swagger in all environments
 app.UseSwagger();
 app.UseSwaggerUI();
 
-// Redirect root to Swagger
 app.Use(async (context, next) =>
 {
     if (context.Request.Path == "/")
@@ -81,22 +63,18 @@ app.Use(async (context, next) =>
     await next();
 });
 
-// Add global exception handling middleware
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 
-// Add CORS
 app.UseCors("AllowAll");
 
-// Add Response Caching
 app.UseResponseCaching();
 
 app.UseAuthorization();
 
 app.MapControllers();
 
-// Add Health Checks endpoint
 app.MapHealthChecks("/health");
 
 app.Run();
