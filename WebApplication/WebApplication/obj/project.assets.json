@@ -710,11 +710,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\add-project\\works\\WebApplication\\WebApplication\\WebApplication.csproj",
+      "projectUniqueName": "D:\\add-project\\assignments\\WebApplication\\WebApplication\\WebApplication.csproj",
       "projectName": "WebApplication",
-      "projectPath": "D:\\add-project\\works\\WebApplication\\WebApplication\\WebApplication.csproj",
+      "projectPath": "D:\\add-project\\assignments\\WebApplication\\WebApplication\\WebApplication.csproj",
       "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
-      "outputPath": "D:\\add-project\\works\\WebApplication\\WebApplication\\obj\\",
+      "outputPath": "D:\\add-project\\assignments\\WebApplication\\WebApplication\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "D:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
