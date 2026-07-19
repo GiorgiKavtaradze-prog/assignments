@@ -51,7 +51,6 @@ public class PersonController : ControllerBase
     {
         List<PersonDto> people;
         
-        // If any filter is provided, use filter; otherwise return all
         if (minSalary.HasValue || maxSalary.HasValue || !string.IsNullOrWhiteSpace(city))
         {
             people = await _personService.FilterAsyncDto(minSalary, maxSalary, city);
