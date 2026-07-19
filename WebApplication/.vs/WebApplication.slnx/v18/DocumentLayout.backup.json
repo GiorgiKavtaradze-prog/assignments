@@ -1,0 +1,185 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\add-project\\works\\WebApplication\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\add-project\\works\\WebApplication\\WebApplication\\Controllers\\PersonController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:WebApplication\\Controllers\\PersonController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\add-project\\WebApplication\\WebApplication\\Validators\\PersonValidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\add-project\\WebApplication\\WebApplication\\Validators\\PersonAddressValidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\add-project\\WebApplication\\WebApplication\\DTOs\\ApiResponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\add-project\\works\\WebApplication\\WebApplication\\Responses\\ApiResponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:WebApplication\\Responses\\ApiResponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\add-project\\works\\WebApplication\\WebApplication\\Validators\\PersonAddressCreateDtoValidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:WebApplication\\Validators\\PersonAddressCreateDtoValidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\add-project\\works\\WebApplication\\WebApplication\\Models\\PersonAddress.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:WebApplication\\Models\\PersonAddress.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\add-project\\works\\WebApplication\\WebApplication\\Program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:WebApplication\\Program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\add-project\\works\\WebApplication\\WebApplication\\Models\\MappingProfile.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:WebApplication\\Models\\MappingProfile.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\add-project\\works\\WebApplication\\WebApplication\\Models\\Person.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:WebApplication\\Models\\Person.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 7,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "ApiResponse.cs",
+              "DocumentMoniker": "D:\\add-project\\works\\WebApplication\\WebApplication\\Responses\\ApiResponse.cs",
+              "RelativeDocumentMoniker": "WebApplication\\Responses\\ApiResponse.cs",
+              "ToolTip": "D:\\add-project\\works\\WebApplication\\WebApplication\\Responses\\ApiResponse.cs",
+              "RelativeToolTip": "WebApplication\\Responses\\ApiResponse.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-19T09:45:11.432Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "PersonAddressCreateDtoValidator.cs",
+              "DocumentMoniker": "D:\\add-project\\works\\WebApplication\\WebApplication\\Validators\\PersonAddressCreateDtoValidator.cs",
+              "RelativeDocumentMoniker": "WebApplication\\Validators\\PersonAddressCreateDtoValidator.cs",
+              "ToolTip": "D:\\add-project\\works\\WebApplication\\WebApplication\\Validators\\PersonAddressCreateDtoValidator.cs",
+              "RelativeToolTip": "WebApplication\\Validators\\PersonAddressCreateDtoValidator.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-19T09:42:49.322Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "PersonAddress.cs",
+              "DocumentMoniker": "D:\\add-project\\works\\WebApplication\\WebApplication\\Models\\PersonAddress.cs",
+              "RelativeDocumentMoniker": "WebApplication\\Models\\PersonAddress.cs",
+              "ToolTip": "D:\\add-project\\works\\WebApplication\\WebApplication\\Models\\PersonAddress.cs",
+              "RelativeToolTip": "WebApplication\\Models\\PersonAddress.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-19T08:49:38.952Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "PersonValidator.cs",
+              "DocumentMoniker": "D:\\add-project\\WebApplication\\WebApplication\\Validators\\PersonValidator.cs",
+              "RelativeDocumentMoniker": "..\\..\\WebApplication\\WebApplication\\Validators\\PersonValidator.cs",
+              "ToolTip": "D:\\add-project\\WebApplication\\WebApplication\\Validators\\PersonValidator.cs",
+              "RelativeToolTip": "..\\..\\WebApplication\\WebApplication\\Validators\\PersonValidator.cs",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-19T08:49:31.941Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "PersonAddressValidator.cs",
+              "DocumentMoniker": "D:\\add-project\\WebApplication\\WebApplication\\Validators\\PersonAddressValidator.cs",
+              "RelativeDocumentMoniker": "..\\..\\WebApplication\\WebApplication\\Validators\\PersonAddressValidator.cs",
+              "ToolTip": "D:\\add-project\\WebApplication\\WebApplication\\Validators\\PersonAddressValidator.cs",
+              "RelativeToolTip": "..\\..\\WebApplication\\WebApplication\\Validators\\PersonAddressValidator.cs",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-19T08:49:29.352Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\add-project\\works\\WebApplication\\WebApplication\\Program.cs",
+              "RelativeDocumentMoniker": "WebApplication\\Program.cs",
+              "ToolTip": "D:\\add-project\\works\\WebApplication\\WebApplication\\Program.cs",
+              "RelativeToolTip": "WebApplication\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABoAAAA1AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-19T08:25:39.413Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "PersonController.cs",
+              "DocumentMoniker": "D:\\add-project\\works\\WebApplication\\WebApplication\\Controllers\\PersonController.cs",
+              "RelativeDocumentMoniker": "WebApplication\\Controllers\\PersonController.cs",
+              "ToolTip": "D:\\add-project\\works\\WebApplication\\WebApplication\\Controllers\\PersonController.cs",
+              "RelativeToolTip": "WebApplication\\Controllers\\PersonController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAbAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-19T08:49:23.646Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "MappingProfile.cs",
+              "DocumentMoniker": "D:\\add-project\\works\\WebApplication\\WebApplication\\Models\\MappingProfile.cs",
+              "RelativeDocumentMoniker": "WebApplication\\Models\\MappingProfile.cs",
+              "ToolTip": "D:\\add-project\\works\\WebApplication\\WebApplication\\Models\\MappingProfile.cs",
+              "RelativeToolTip": "WebApplication\\Models\\MappingProfile.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-19T09:42:51.934Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "Person.cs",
+              "DocumentMoniker": "D:\\add-project\\works\\WebApplication\\WebApplication\\Models\\Person.cs",
+              "RelativeDocumentMoniker": "WebApplication\\Models\\Person.cs",
+              "ToolTip": "D:\\add-project\\works\\WebApplication\\WebApplication\\Models\\Person.cs",
+              "RelativeToolTip": "WebApplication\\Models\\Person.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-19T09:42:53.933Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "ApiResponse.cs",
+              "DocumentMoniker": "D:\\add-project\\WebApplication\\WebApplication\\DTOs\\ApiResponse.cs",
+              "RelativeDocumentMoniker": "..\\..\\WebApplication\\WebApplication\\DTOs\\ApiResponse.cs",
+              "ToolTip": "D:\\add-project\\WebApplication\\WebApplication\\DTOs\\ApiResponse.cs",
+              "RelativeToolTip": "..\\..\\WebApplication\\WebApplication\\DTOs\\ApiResponse.cs",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-19T09:44:49.58Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
