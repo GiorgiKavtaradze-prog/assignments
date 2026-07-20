@@ -1,8 +1,10 @@
-namespace WebApplication.Dtos;
+namespace WebApplication.DTOs;
 
-public class PersonAddressCreateDto
+public sealed record PersonAddressCreateDto
 {
-    public string Country { get; set; } = string.Empty;
-    public string City { get; set; } = string.Empty;
-    public string HomeNumber { get; set; } = string.Empty;
+    public required string Country { get; init; }
+
+    public required string City { get; init; }
+
+    public required string HomeNumber { get; init; }
 }

@@ -1,146 +1,87 @@
+using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
-using WebApplication.Dtos;
+using WebApplication.DTOs;
 using WebApplication.Responses;
-using WebApplication.Services;
+using WebApplication.Services.Interfaces;
 
 namespace WebApplication.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
 [ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/[controller]")]
 [Produces("application/json")]
-public class PersonController : ControllerBase
+public sealed class PersonController(IPersonService personService) : ControllerBase
 {
-    private readonly IPersonService _personService;
-
-    public PersonController(IPersonService personService)
-    {
-        _personService = personService;
-    }
-
-    [HttpPost]
-    [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<ApiResponse<PersonDto>>> CreatePerson([FromBody] PersonCreateDto person)
-    {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(new ApiResponse<PersonDto>
-            {
-                Success = false,
-                Errors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage)).ToList()
-            });
-        }
-
-        var createdPerson = await _personService.AddAsync(person);
-        return CreatedAtAction(nameof(GetPersonById), new { id = createdPerson.Id }, new ApiResponse<PersonDto>
-        {
-            Success = true,
-            Data = createdPerson,
-            Message = "Person created successfully"
-        });
-    }
+    private readonly IPersonService _personService = personService;
 
     [HttpGet]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ResponseCache(Duration = 60, Location = ResponseCacheLocation.Any)]
-    public async Task<ActionResult<ApiResponse<List<PersonDto>>>> GetAllPeople(
-        [FromQuery] double? minSalary,
-        [FromQuery] double? maxSalary,
-        [FromQuery] string? city)
+    [ProducesResponseType(typeof(ApiResponse<PagedResult<PersonDto>>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<ApiResponse<PagedResult<PersonDto>>>> GetPeople(
+        [FromQuery] PersonFilter filter,
+        CancellationToken cancellationToken)
     {
-        List<PersonDto> people;
-        
-        if (minSalary.HasValue || maxSalary.HasValue || !string.IsNullOrWhiteSpace(city))
-        {
-            people = await _personService.FilterAsyncDto(minSalary, maxSalary, city);
-        }
-        else
-        {
-            people = await _personService.GetAllWithoutFilterAsyncDto();
-        }
-        
-        return Ok(new ApiResponse<List<PersonDto>>
-        {
-            Success = true,
-            Data = people
-        });
+        var paged = await _personService.GetPagedAsync(filter, cancellationToken);
+        return Ok(ApiResponse<PagedResult<PersonDto>>.Ok(paged));
     }
 
     [HttpGet("{id:int}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<PersonDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<ApiResponse<PersonDto>>> GetPersonById(int id)
+    public async Task<ActionResult<ApiResponse<PersonDto>>> GetPersonById(int id, CancellationToken cancellationToken)
     {
-        var person = await _personService.GetByIdAsyncDto(id);
-        if (person == null)
+        var person = await _personService.GetByIdAsync(id, cancellationToken);
+        if (person is null)
         {
-            return NotFound(new ApiResponse<PersonDto>
-            {
-                Success = false,
-                Message = $"Person with id {id} not found"
-            });
+            return NotFound(ApiResponse<PersonDto>.Fail($"Person with id {id} not found"));
         }
-        return Ok(new ApiResponse<PersonDto>
-        {
-            Success = true,
-            Data = person
-        });
+
+        return Ok(ApiResponse<PersonDto>.Ok(person));
+    }
+
+    [HttpPost]
+    [ProducesResponseType(typeof(ApiResponse<PersonDto>), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<ApiResponse<PersonDto>>> CreatePerson(
+        [FromBody] PersonCreateDto person,
+        CancellationToken cancellationToken)
+    {
+        var created = await _personService.AddAsync(person, cancellationToken);
+
+        return CreatedAtAction(
+            nameof(GetPersonById),
+            new { id = created.Id },
+            ApiResponse<PersonDto>.Ok(created, "Person created successfully"));
     }
 
     [HttpPut("{id:int}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<PersonDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<ApiResponse<PersonDto>>> UpdatePerson(int id, [FromBody] PersonUpdateDto person)
+    public async Task<ActionResult<ApiResponse<PersonDto>>> UpdatePerson(
+        int id,
+        [FromBody] PersonUpdateDto person,
+        CancellationToken cancellationToken)
     {
-        if (!ModelState.IsValid)
+        var updated = await _personService.UpdateAsync(id, person, cancellationToken);
+        if (updated is null)
         {
-            return BadRequest(new ApiResponse<PersonDto>
-            {
-                Success = false,
-                Errors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage)).ToList()
-            });
+            return NotFound(ApiResponse<PersonDto>.Fail($"Person with id {id} not found"));
         }
 
-        var updatedPerson = await _personService.UpdateAsync(id, person);
-        if (updatedPerson == null)
-        {
-            return NotFound(new ApiResponse<PersonDto>
-            {
-                Success = false,
-                Message = $"Person with id {id} not found"
-            });
-        }
-        return Ok(new ApiResponse<PersonDto>
-        {
-            Success = true,
-            Data = updatedPerson,
-            Message = "Person updated successfully"
-        });
+        return Ok(ApiResponse<PersonDto>.Ok(updated, "Person updated successfully"));
     }
 
     [HttpDelete("{id:int}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<ApiResponse<List<PersonDto>>>> DeletePerson(int id)
+    public async Task<IActionResult> DeletePerson(int id, CancellationToken cancellationToken)
     {
-        var deleted = await _personService.DeleteAsync(id);
+        var deleted = await _personService.DeleteAsync(id, cancellationToken);
         if (!deleted)
         {
-            return NotFound(new ApiResponse<List<PersonDto>>
-            {
-                Success = false,
-                Message = $"Person with id {id} not found"
-            });
+            return NotFound();
         }
-        
-        var updatedList = await _personService.GetAllWithoutFilterAsyncDto();
-        return Ok(new ApiResponse<List<PersonDto>>
-        {
-            Success = true,
-            Data = updatedList,
-            Message = "Person deleted successfully"
-        });
+
+        return NoContent();
     }
 }

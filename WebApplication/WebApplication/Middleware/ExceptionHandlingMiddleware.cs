@@ -1,46 +1,56 @@
-using System.Net;
-using System.Text.Json;
-using WebApplication.Responses;
+using Microsoft.AspNetCore.Mvc;
 
 namespace WebApplication.Middleware;
 
-public class ExceptionHandlingMiddleware
+public sealed class ExceptionHandlingMiddleware(RequestDelegate next)
 {
-    private readonly RequestDelegate _next;
-    private readonly ILogger<ExceptionHandlingMiddleware> _logger;
+    private readonly RequestDelegate _next = next;
 
-    public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
-    {
-        _next = next;
-        _logger = logger;
-    }
-
-    public async Task InvokeAsync(HttpContext context)
+    public async Task InvokeAsync(
+        HttpContext context,
+        ILogger<ExceptionHandlingMiddleware> logger,
+        IHostEnvironment environment)
     {
         try
         {
             await _next(context);
         }
+        catch (OperationCanceledException)
+        {
+            context.Response.StatusCode = StatusCodes.Status499ClientClosedRequest;
+        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unhandled exception occurred");
-            await HandleExceptionAsync(context, ex);
+            logger.LogError(ex, "An unhandled exception occurred while processing {Method} {Path}",
+                context.Request.Method, context.Request.Path);
+
+            await WriteProblemDetailsAsync(context, ex, environment);
         }
     }
 
-    private static async Task HandleExceptionAsync(HttpContext context, Exception exception)
+    private static async Task WriteProblemDetailsAsync(
+        HttpContext context, Exception ex, IHostEnvironment environment)
     {
-        context.Response.ContentType = "application/json";
-        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-
-        var response = new ApiResponse<object>
+        var (status, title) = ex switch
         {
-            Success = false,
-            Message = "An internal server error occurred",
-            Errors = new List<string> { exception.Message }
+            ArgumentException => (StatusCodes.Status400BadRequest, "Bad Request"),
+            UnauthorizedAccessException => (StatusCodes.Status401Unauthorized, "Unauthorized"),
+            _ => (StatusCodes.Status500InternalServerError, "Internal Server Error")
         };
 
-        var json = JsonSerializer.Serialize(response);
-        await context.Response.WriteAsync(json);
+        var problem = new ProblemDetails
+        {
+            Status = status,
+            Title = title,
+            Detail = environment.IsDevelopment()
+                ? ex.ToString()
+                : "An internal server error occurred.",
+            Instance = context.Request.Path
+        };
+
+        context.Response.StatusCode = status;
+        context.Response.ContentType = "application/problem+json";
+
+        await context.Response.WriteAsJsonAsync(problem);
     }
 }

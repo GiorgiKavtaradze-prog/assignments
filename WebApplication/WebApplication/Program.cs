@@ -1,20 +1,34 @@
+using Asp.Versioning;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Versioning;
-using Microsoft.OpenApi;
+using Microsoft.Extensions.Options;
+using Scalar.AspNetCore;
 using WebApplication.Middleware;
-using WebApplication.Models;
+using WebApplication.Options;
 using WebApplication.Services;
+using WebApplication.Services.Interfaces;
 using WebApplication.Validators;
 
-var builder = Microsoft.AspNetCore.Builder.WebApplication.CreateBuilder(args);
+using WebApplicationApp = Microsoft.AspNetCore.Builder.WebApplication;
 
-builder.Services.AddScoped<IPersonService, PersonService>();
-builder.Services.AddAutoMapper(typeof(MappingProfile));
+var builder = WebApplicationApp.CreateBuilder(args);
+
+builder.Services.Configure<PersonStoreOptions>(
+    builder.Configuration.GetSection(PersonStoreOptions.SectionName));
+
+builder.Services.AddSingleton<IPersonService>(sp =>
+{
+    var options = sp.GetRequiredService<IOptions<PersonStoreOptions>>().Value;
+    var logger = sp.GetRequiredService<ILogger<PersonService>>();
+    var filePath = Path.IsPathRooted(options.FilePath)
+        ? options.FilePath
+        : Path.Combine(builder.Environment.ContentRootPath, options.FilePath);
+    return new PersonService(filePath, logger);
+});
+
 builder.Services.AddControllers();
-builder.Services.AddFluentValidationAutoValidation();
-builder.Services.AddValidatorsFromAssemblyContaining<PersonCreateDtoValidator>();
+builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddApiVersioning(options =>
 {
     options.DefaultApiVersion = new ApiVersion(1, 0);
@@ -23,41 +37,50 @@ builder.Services.AddApiVersioning(options =>
     options.ApiVersionReader = ApiVersionReader.Combine(
         new UrlSegmentApiVersionReader(),
         new QueryStringApiVersionReader("api-version"),
-        new HeaderApiVersionReader("X-API-Version")
-    );
+        new HeaderApiVersionReader("X-API-Version"));
+}).AddApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'VVV";
+    options.SubstituteApiVersionInUrl = true;
+});
+
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssemblyContaining<PersonCreateDtoValidator>();
+
+builder.Services.AddProblemDetails(options =>
+{
+    options.CustomizeProblemDetails = ctx =>
+    {
+        ctx.ProblemDetails.Extensions["instance"] = ctx.HttpContext.Request.Path.Value ?? string.Empty;
+    };
 });
 builder.Services.AddResponseCaching();
 builder.Services.AddHealthChecks();
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAll", policy =>
-    {
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
-    });
-});
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
-{
-    options.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Title = "Person API",
-        Version = "v1",
-        Description = "RESTful API for managing people"
-    });
-});
+builder.Services.AddCors();
+
+builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
-app.UseSwagger();
-app.UseSwaggerUI();
+if (app.Environment.IsDevelopment())
+{
+    app.UseStaticFiles();
+    
+    app.MapOpenApi();
+
+    app.MapScalarApiReference(options =>
+    {
+        options.WithTitle("Person API")
+               .WithTheme(ScalarTheme.DeepSpace)
+               .WithJavaScriptConfiguration("/scalar/config.js");
+    });
+}
 
 app.Use(async (context, next) =>
 {
     if (context.Request.Path == "/")
     {
-        context.Response.Redirect("/swagger");
+        context.Response.Redirect("/scalar/");
         return;
     }
     await next();
@@ -67,7 +90,11 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 
-app.UseCors("AllowAll");
+var allowedOrigins = app.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
+app.UseCors(policy => policy
+    .WithOrigins(allowedOrigins)
+    .AllowAnyMethod()
+    .AllowAnyHeader());
 
 app.UseResponseCaching();
 
