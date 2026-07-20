@@ -1,8 +1,8 @@
 # Person API
 
-![C# CommSchool image](public/CommSchool.jpg)
-
----
+![C# CommSchool image](public/CommSchool.jpg)    
+  
+---  
 
 <div align="center">
 
