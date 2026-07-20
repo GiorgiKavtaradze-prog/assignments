@@ -1,9 +1,9 @@
 using FluentValidation;
-using WebApplication.Dtos;
+using WebApplication.DTOs;
 
 namespace WebApplication.Validators;
 
-public class PersonAddressCreateDtoValidator : AbstractValidator<PersonAddressCreateDto>
+public sealed class PersonAddressCreateDtoValidator : AbstractValidator<PersonAddressCreateDto>
 {
     public PersonAddressCreateDtoValidator()
     {

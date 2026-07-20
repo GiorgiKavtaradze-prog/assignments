@@ -1,13 +1,20 @@
 namespace WebApplication.Models;
 
-public class Person
+public sealed record Person
 {
-    public int Id { get; set; }
-    public DateTime CreateDate { get; set; }
-    public string Firstname { get; set; } = string.Empty;
-    public string Lastname { get; set; } = string.Empty;
-    public string JobPosition { get; set; } = string.Empty;
-    public double Salary { get; set; }
-    public double WorkExperience { get; set; }
-    public PersonAddress Address { get; set; } = new PersonAddress();
+    public required int Id { get; init; }
+
+    public DateTime CreateDate { get; init; } = DateTime.UtcNow;
+
+    public required string Firstname { get; init; }
+
+    public required string Lastname { get; init; }
+
+    public required string JobPosition { get; init; }
+
+    public required decimal Salary { get; init; }
+
+    public required double WorkExperience { get; init; }
+
+    public required PersonAddress Address { get; init; }
 }

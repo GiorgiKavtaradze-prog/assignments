@@ -1,163 +1,202 @@
-using AutoMapper;
 using System.Text.Json;
-using WebApplication.Dtos;
+using WebApplication.DTOs;
+using WebApplication.Extensions;
 using WebApplication.Models;
+using WebApplication.Services.Interfaces;
 
 namespace WebApplication.Services;
 
-public class PersonService : IPersonService
+public sealed class PersonService : IPersonService
 {
-    private readonly string _filePath = Path.Combine(Directory.GetCurrentDirectory(), "people.json");
-    private readonly IMapper _mapper;
+    private readonly string _filePath;
+    private readonly SemaphoreSlim _fileLock = new(1, 1);
+    private readonly ILogger<PersonService> _logger;
 
-    public PersonService(IMapper mapper)
+    public PersonService(string filePath, ILogger<PersonService> logger)
     {
-        _mapper = mapper;
-        if (!File.Exists(_filePath))
-        {
-            File.WriteAllText(_filePath, "[]");
-        }
+        _filePath = filePath;
+        _logger = logger;
+        EnsureFileExists();
     }
 
-    public async Task<List<Person>> GetAllAsync()
+    public async Task<PagedResult<PersonDto>> GetPagedAsync(PersonFilter filter, CancellationToken cancellationToken)
     {
-        var json = await File.ReadAllTextAsync(_filePath);
-        return JsonSerializer.Deserialize<List<Person>>(json) ?? new List<Person>();
-    }
+        var people = await ReadAllAsync(cancellationToken);
+        var filtered = ApplyFilter(people, filter);
 
-    public async Task<PagedResult<PersonDto>> GetAllAsync(int page, int pageSize)
-    {
-        var people = await GetAllAsync();
-        var totalPages = (int)Math.Ceiling((double)people.Count / pageSize);
-        
-        var pagedPeople = people
+        var page = Math.Max(filter.Page, 1);
+        var pageSize = Math.Clamp(filter.PageSize, 1, 200);
+
+        var pageItems = filtered
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
-            .ToList();
+            .ToDtos();
 
-        return new PagedResult<PersonDto>
+        return PagedResult<PersonDto>.Create(pageItems, page, pageSize, filtered.Count);
+    }
+
+    public async Task<PersonDto?> GetByIdAsync(int id, CancellationToken cancellationToken)
+    {
+        var people = await ReadAllAsync(cancellationToken);
+        return people.FirstOrDefault(p => p.Id == id)?.ToDto();
+    }
+
+    public async Task<IReadOnlyList<PersonDto>> FilterAsync(PersonFilter filter, CancellationToken cancellationToken)
+    {
+        var people = await ReadAllAsync(cancellationToken);
+        return ApplyFilter(people, filter).ToDtos();
+    }
+
+    public async Task<PersonDto> AddAsync(PersonCreateDto dto, CancellationToken cancellationToken)
+    {
+        await _fileLock.WaitAsync(cancellationToken);
+        try
         {
-            Page = page,
-            PageSize = pageSize,
-            TotalCount = people.Count,
-            TotalPages = totalPages,
-            Data = _mapper.Map<List<PersonDto>>(pagedPeople)
-        };
-    }
-
-    public async Task<Person?> GetByIdAsync(int id)
-    {
-        var people = await GetAllAsync();
-        return people.FirstOrDefault(p => p.Id == id);
-    }
-
-    public async Task<PersonDto?> GetByIdAsyncDto(int id)
-    {
-        var person = await GetByIdAsync(id);
-        return person != null ? _mapper.Map<PersonDto>(person) : null;
-    }
-
-    public async Task<Person> AddAsync(Person person)
-    {
-        var people = await GetAllAsync();
-        person.Id = people.Count > 0 ? people.Max(p => p.Id) + 1 : 1;
-        people.Add(person);
-        await SaveToFileAsync(people);
-        return person;
-    }
-
-    public async Task<PersonDto> AddAsync(PersonCreateDto personDto)
-    {
-        var person = _mapper.Map<Person>(personDto);
-        var createdPerson = await AddAsync(person);
-        return _mapper.Map<PersonDto>(createdPerson);
-    }
-
-    public async Task<Person?> UpdateAsync(int id, Person person)
-    {
-        var people = await GetAllAsync();
-        var index = people.FindIndex(p => p.Id == id);
-        if (index != -1)
-        {
-            person.Id = id;
-            people[index] = person;
-            await SaveToFileAsync(people);
-            return person;
+            var people = await ReadAllUnsafeAsync(cancellationToken);
+            var nextId = people.Count > 0 ? people.Max(p => p.Id) + 1 : 1;
+            var person = dto.ToEntity(nextId);
+            people.Add(person);
+            await WriteAllAsync(people, cancellationToken);
+            return person.ToDto();
         }
-        return null;
-    }
-
-    public async Task<PersonDto?> UpdateAsync(int id, PersonUpdateDto personDto)
-    {
-        var people = await GetAllAsync();
-        var index = people.FindIndex(p => p.Id == id);
-        if (index != -1)
+        finally
         {
-            var person = _mapper.Map<Person>(personDto);
-            person.Id = id;
-            people[index] = person;
-            await SaveToFileAsync(people);
-            return _mapper.Map<PersonDto>(person);
+            _fileLock.Release();
         }
-        return null;
     }
 
-    public async Task<bool> DeleteAsync(int id)
+    public async Task<PersonDto?> UpdateAsync(int id, PersonUpdateDto dto, CancellationToken cancellationToken)
     {
-        var people = await GetAllAsync();
-        var personToRemove = people.FirstOrDefault(p => p.Id == id);
-        if (personToRemove != null)
+        await _fileLock.WaitAsync(cancellationToken);
+        try
         {
-            people.Remove(personToRemove);
-            await SaveToFileAsync(people);
+            var people = await ReadAllUnsafeAsync(cancellationToken);
+            var index = people.FindIndex(p => p.Id == id);
+            if (index == -1)
+            {
+                return null;
+            }
+
+            var updated = people[index].With(dto);
+            people[index] = updated;
+            await WriteAllAsync(people, cancellationToken);
+            return updated.ToDto();
+        }
+        finally
+        {
+            _fileLock.Release();
+        }
+    }
+
+    public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken)
+    {
+        await _fileLock.WaitAsync(cancellationToken);
+        try
+        {
+            var people = await ReadAllUnsafeAsync(cancellationToken);
+            var index = people.FindIndex(p => p.Id == id);
+            if (index == -1)
+            {
+                return false;
+            }
+
+            people.RemoveAt(index);
+            await WriteAllAsync(people, cancellationToken);
             return true;
         }
-        return false;
+        finally
+        {
+            _fileLock.Release();
+        }
     }
 
-    public async Task<List<Person>> FilterAsync(double? minSalary, double? maxSalary, string? city)
+    private static IReadOnlyList<Person> ApplyFilter(IReadOnlyList<Person> people, PersonFilter filter)
     {
-        var people = await GetAllAsync();
-        var filtered = people.AsEnumerable();
+        IEnumerable<Person> result = people;
 
-        if (minSalary.HasValue)
+        if (filter.MinSalary.HasValue)
         {
-            filtered = filtered.Where(p => p.Salary >= minSalary.Value);
+            result = result.Where(p => p.Salary >= filter.MinSalary.Value);
         }
 
-        if (maxSalary.HasValue)
+        if (filter.MaxSalary.HasValue)
         {
-            filtered = filtered.Where(p => p.Salary <= maxSalary.Value);
+            result = result.Where(p => p.Salary <= filter.MaxSalary.Value);
         }
 
-        if (!string.IsNullOrWhiteSpace(city))
+        if (!string.IsNullOrWhiteSpace(filter.City))
         {
-            filtered = filtered.Where(p => p.Address.City.Equals(city, StringComparison.OrdinalIgnoreCase));
+            result = result.Where(p =>
+                p.Address.City.Equals(filter.City, StringComparison.OrdinalIgnoreCase));
         }
 
-        return filtered.ToList();
+        return result.ToArray();
     }
 
-    public async Task<List<Person>> GetAllWithoutFilterAsync()
+    private async Task<List<Person>> ReadAllAsync(CancellationToken ct)
     {
-        return await GetAllAsync();
+        await _fileLock.WaitAsync(ct);
+        try
+        {
+            return await ReadAllUnsafeAsync(ct);
+        }
+        finally
+        {
+            _fileLock.Release();
+        }
     }
 
-    public async Task<List<PersonDto>> GetAllWithoutFilterAsyncDto()
+    private async Task<List<Person>> ReadAllUnsafeAsync(CancellationToken ct)
     {
-        var people = await GetAllWithoutFilterAsync();
-        return _mapper.Map<List<PersonDto>>(people);
+        if (!File.Exists(_filePath))
+        {
+            return [];
+        }
+
+        await using var stream = new FileStream(
+            _filePath, FileMode.Open, FileAccess.Read, FileShare.Read,
+            bufferSize: 4096, useAsync: true);
+
+        var people = await JsonSerializer.DeserializeAsync(stream, PersonStoreJsonContext.Default.ListPerson, ct);
+        return people ?? [];
     }
 
-    public async Task<List<PersonDto>> FilterAsyncDto(double? minSalary, double? maxSalary, string? city)
+    private async Task WriteAllAsync(List<Person> people, CancellationToken ct)
     {
-        var people = await FilterAsync(minSalary, maxSalary, city);
-        return _mapper.Map<List<PersonDto>>(people);
+        var directory = Path.GetDirectoryName(_filePath) ?? AppContext.BaseDirectory;
+        Directory.CreateDirectory(directory);
+
+        var tempPath = Path.Combine(directory,
+            $"{Path.GetFileNameWithoutExtension(_filePath)}.{Guid.NewGuid():N}.tmp");
+
+        await using (var stream = new FileStream(
+                        tempPath, FileMode.Create, FileAccess.Write, FileShare.None,
+                        bufferSize: 4096, useAsync: true))
+        {
+            await JsonSerializer.SerializeAsync(stream, people, PersonStoreJsonContext.Default.ListPerson, ct);
+        }
+        File.Move(tempPath, _filePath, overwrite: true);
     }
 
-    private async Task SaveToFileAsync(List<Person> people)
+    private void EnsureFileExists()
     {
-        var json = JsonSerializer.Serialize(people, new JsonSerializerOptions { WriteIndented = true });
-        await File.WriteAllTextAsync(_filePath, json);
+        try
+        {
+            var directory = Path.GetDirectoryName(_filePath);
+            if (!string.IsNullOrEmpty(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
+            if (!File.Exists(_filePath))
+            {
+                File.WriteAllText(_filePath, "[]");
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to initialize person store at {FilePath}", _filePath);
+            throw;
+        }
     }
 }

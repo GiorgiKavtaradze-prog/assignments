@@ -1,6 +1,56 @@
 @WebApplication_HostAddress = http://localhost:5228
+@ApiVersion = v1
 
-GET {{WebApplication_HostAddress}}/weatherforecast/
+### Get paged list of people
+GET {{WebApplication_HostAddress}}/api/{{ApiVersion}}/person?page=1&pageSize=10
 Accept: application/json
+
+### Filter by salary range and city
+GET {{WebApplication_HostAddress}}/api/{{ApiVersion}}/person?minSalary=1000&maxSalary=2000&city=tbilisi
+Accept: application/json
+
+### Get a single person by id
+GET {{WebApplication_HostAddress}}/api/{{ApiVersion}}/person/3
+Accept: application/json
+
+### Create a new person
+POST {{WebApplication_HostAddress}}/api/{{ApiVersion}}/person
+Content-Type: application/json
+
+{
+  "firstname": "Nino",
+  "lastname": "Beridze",
+  "jobPosition": "QA Engineer",
+  "salary": 2500,
+  "workExperience": 3.5,
+  "address": {
+    "country": "Georgia",
+    "city": "Tbilisi",
+    "homeNumber": "555123456"
+  }
+}
+
+### Update an existing person
+PUT {{WebApplication_HostAddress}}/api/{{ApiVersion}}/person/3
+Content-Type: application/json
+
+{
+  "firstname": "Giorgi",
+  "lastname": "Kavtaradze",
+  "jobPosition": "Senior Web Developer",
+  "salary": 3000,
+  "workExperience": 4.5,
+  "address": {
+    "country": "Georgia",
+    "city": "Tbilisi",
+    "homeNumber": "599715701"
+  }
+}
+
+### Delete a person (expects 204 No Content)
+DELETE {{WebApplication_HostAddress}}/api/{{ApiVersion}}/person/2
+
+### Health check
+GET {{WebApplication_HostAddress}}/health
 
 ###

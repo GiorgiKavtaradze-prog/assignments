@@ -1,14 +1,14 @@
 using FluentValidation;
-using WebApplication.Dtos;
+using WebApplication.DTOs;
 
 namespace WebApplication.Validators;
 
-public class PersonUpdateDtoValidator : AbstractValidator<PersonUpdateDto>
+public sealed class PersonUpdateDtoValidator : AbstractValidator<PersonUpdateDto>
 {
     public PersonUpdateDtoValidator()
     {
-RuleFor(x => x.CreateDate)
-             .LessThanOrEqualTo(DateTime.Now).WithMessage("CreateDate cannot be in the future");
+        RuleFor(x => x.CreateDate)
+            .LessThanOrEqualTo(DateTime.UtcNow).WithMessage("CreateDate cannot be in the future");
 
         RuleFor(x => x.Firstname)
             .NotEmpty().WithMessage("Firstname is required")
@@ -23,9 +23,9 @@ RuleFor(x => x.CreateDate)
             .MaximumLength(50).WithMessage("JobPosition must not exceed 50 characters");
 
         RuleFor(x => x.Salary)
-            .InclusiveBetween(0, 10000).WithMessage("Salary must be between 0 and 10000");
+            .InclusiveBetween(0m, 100000m).WithMessage("Salary must be between 0 and 100000");
 
-RuleFor(x => x.WorkExperience)
+        RuleFor(x => x.WorkExperience)
             .GreaterThanOrEqualTo(0).WithMessage("WorkExperience must be greater than or equal to 0");
 
         RuleFor(x => x.Address)

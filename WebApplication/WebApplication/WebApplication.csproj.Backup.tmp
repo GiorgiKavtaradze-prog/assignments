@@ -9,27 +9,31 @@
     <AnalysisLevel>latest-recommended</AnalysisLevel>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
-    <NoWarn>$(NoWarn);NU1903;CA1000;CA1001;CA1848;CA1859;CS0200</NoWarn>
-    <OpenApiGenerateDocuments>false</OpenApiGenerateDocuments>
+    <NoWarn>$(NoWarn);NU1903</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
+    <!-- .NET 10 built-in OpenAPI spec generation (Microsoft-supported, replaces Swashbuckle) -->
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.10" />
+    <!-- Explicit override to use patched Microsoft.OpenApi version -->
+    <PackageReference Include="Microsoft.OpenApi" Version="3.9.0" />
+    <PackageReference Include="Microsoft.OpenApi.Readers" Version="1.6.29" />
+
+    <!-- Modern OpenAPI UI (replaces Swagger UI; works natively with .NET 10 built-in OpenAPI) -->
     <PackageReference Include="Scalar.AspNetCore" Version="2.16.15" />
-    <PackageReference Include="NSwag.AspNetCore" Version="14.2.0" />
+
+    <!-- API versioning (modern successor to Microsoft.AspNetCore.Mvc.Versioning) -->
     <PackageReference Include="Asp.Versioning.Mvc" Version="8.1.0" />
     <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0" />
-    <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.1" />
+
+    <!-- Validation (FluentValidation.AspNetCore is deprecated; use DI extensions directly) -->
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.10.0" />
   </ItemGroup>
 
   <ItemGroup>
     <None Update="people.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Mappings\" />
   </ItemGroup>
 
 </Project>

@@ -1,9 +1,26 @@
 namespace WebApplication.Responses;
 
-public class ApiResponse<T>
+public sealed record ApiResponse<T>
 {
-    public bool Success { get; set; }
-    public T? Data { get; set; }
-    public string? Message { get; set; }
-    public List<string>? Errors { get; set; }
+    public required bool Success { get; init; }
+
+    public T? Data { get; init; }
+
+    public string? Message { get; init; }
+
+    public IReadOnlyList<string>? Errors { get; init; }
+
+    public static ApiResponse<T> Ok(T data, string? message = null) => new()
+    {
+        Success = true,
+        Data = data,
+        Message = message
+    };
+
+    public static ApiResponse<T> Fail(string message, IReadOnlyList<string>? errors = null) => new()
+    {
+        Success = false,
+        Message = message,
+        Errors = errors
+    };
 }
